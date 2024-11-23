@@ -31,8 +31,6 @@ const buscarCategoria = async (nomeHotel) => {
 const classificarPrimeiroHotel = async (arquivoSQL) => {
 
   const sql = fs.readFileSync(arquivoSQL, 'utf-8');
-  console.log(sql); 
-
 
   const regex = /VALUES\s*\(\s*'(.*?)'\s*,/g;
   const match = regex.exec(sql);
