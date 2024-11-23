@@ -1,43 +1,42 @@
 import fetch from 'node-fetch';
 import fs from 'fs';
 
-// Função para fazer a busca na API
+
 const buscarCategoria = async (nomeHotel) => {
-  const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nomeHotel)}&format=json`;
+  const tiposHotel = [
+    { tipo: 'hotel', url: `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nomeHotel)}+hotel&format=json` },
+    { tipo: 'hostel', url: `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nomeHotel)}+hostel&format=json` },
+    { tipo: 'resort', url: `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nomeHotel)}+resort&format=json` },
+    { tipo: 'pousada', url: `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nomeHotel)}+pousada&format=json` },
+    { tipo: 'flat', url: `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nomeHotel)}+flat&format=json` },
+  ];
 
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    for (let i = 0; i < tiposHotel.length; i++) {
+      const response = await fetch(tiposHotel[i].url);
+      const data = await response.json();
 
-    console.log(data);
+      console.log(data);
 
-    if (data && data.length > 0) {
-      const tipos = data[0].type.toLowerCase();
-      
-      if (tipos.includes('hotel')) {
-        return 'Hotel';
-      } else if (tipos.includes('hostel')) {
-        return 'Hostel';
-      } else if (tipos.includes('resort')) {
-        return 'Resort';
-      } else if (tipos.includes('pousada') || tipos.includes('guesthouse')) {
-        return 'Pousada';
-      } else if (tipos.includes('apartment') || tipos.includes('flat')) {
-        return 'Flat/Apart Hotel';
-      } else {
-        return 'Não classificado';
+
+      if (data && data.length > 0) {
+        return tiposHotel[i].tipo.charAt(0).toUpperCase() + tiposHotel[i].tipo.slice(1); 
       }
-    } else {
-      return 'Não encontrado';
     }
+    
+    return 'Não classificado';
+    
   } catch (error) {
     console.error('Erro ao buscar categoria:', error);
     return 'Erro';
   }
 };
+
+
 const classificarHoteis = async (arquivoSQL) => {
 
   const sql = fs.readFileSync(arquivoSQL, 'utf-8');
+
 
   const regex = /INSERT INTO Hotels \(name,.*\) VALUES \(\s*'(.*?)',/g;
   let match;
@@ -56,5 +55,6 @@ const classificarHoteis = async (arquivoSQL) => {
     console.log(`${nomeHotel} - Categoria: ${categoria}`);
   }
 };
+
 
 classificarHoteis('data/Hotels_202411222154.sql');
