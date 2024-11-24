@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import Hotel from './models/Hotel.js';
+import Hotel from '../models/Hotel.js';
 import stringSimilarity from 'string-similarity';
 
 const categories = {
@@ -11,7 +11,7 @@ const categories = {
     Hotel: ["hotel"],
 };
 
-const findCategoryByDescription = (description) => {
+export const findCategoryByDescription = (description) => {
     const normalizedDescription = description ? description.toLowerCase() : '';
 
     let bestMatch = { rating: 0, category: "Não classificado" };
@@ -34,7 +34,7 @@ const findCategoryByDescription = (description) => {
     return bestMatch.category;
 };
 
-const findCategory = async (hotelName, hotelDescription) => {
+export const findCategory = async (hotelName, hotelDescription) => {
     const urlHotel = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(hotelName)}&format=json`;
 
     const normalizedHotelName = hotelName.toLowerCase();
@@ -68,7 +68,7 @@ const findCategory = async (hotelName, hotelDescription) => {
     return 'Não classificado';
 };
 
-const navigateData = async () => {
+export const navigateData = async () => {
     try {
         const hotels = await Hotel.findAll(); 
         if (hotels.length === 0) {
