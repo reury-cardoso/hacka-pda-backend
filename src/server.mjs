@@ -5,9 +5,7 @@ import sequelize from './../db/db.js';
 import fs from 'fs';
 import path from 'path';
 import Hotel from './models/Hotel.js';
-
-
-
+import dotenv from 'dotenv';
 
 
 const app = express();
@@ -20,8 +18,10 @@ app.use('/api', hotelRoutes);
 
 const startServer = async () => {
   try {
-    // await sequelize.sync({ force: true });
-    await sequelize.sync(); 
+    await sequelize.authenticate();s
+    console.log('Conexão com o banco de dados estabelecida com sucesso!');
+
+    await sequelize.sync();  
     console.log('Banco de dados sincronizado com sucesso!');
 
     app.listen(PORT, () => {
@@ -34,22 +34,22 @@ const startServer = async () => {
 
 const importarDados = async () => {
   try {
-   
     await Hotel.sync({ force: true }); 
     console.log('Tabela Hotels recriada com sucesso!');
 
-   
-    const sql = fs.readFileSync(path.resolve('data', 'Hotels_202411222154.sql'), 'utf-8');
-
-    
-    await sequelize.query(sql);
-
-    console.log('Dados inseridos com sucesso!');
+    const sqlFilePath = path.resolve('src', 'data', 'Hotels_202411222154.sql');
+    if (fs.existsSync(sqlFilePath)) {
+      const sql = fs.readFileSync(sqlFilePath, 'utf-8');
+      await sequelize.query(sql);  
+      console.log('Dados inseridos com sucesso!');
+    } else {
+      console.log('Arquivo SQL não encontrado!');
+    }
   } catch (error) {
     console.error('Erro ao importar dados:', error);
   }
 };
 
-
 startServer();
 importarDados();
+dotenv.config(); 
