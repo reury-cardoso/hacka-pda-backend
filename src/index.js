@@ -41,13 +41,21 @@ const navegarDados = async () => {
         }
 
         const categorias = [            
+            'resort',
             'pousada',    
             'hostel',     
-            'resort',     
             'fazenda',    
-            'farm+hotel', 
-            'flat+hotel', 
-            'apart+hotel' 
+            'farm hotel', 
+            'flat hotel', 
+            'apart hotel',
+            'inn',
+            'chalé',
+            'albergue',
+            'luxury hotel',
+            'farm stay',
+            'agriturismo',
+            'rural retreat',
+            'beach resort',
         ];
 
         for (const hotel of hotéis) {
@@ -64,3 +72,4 @@ const navegarDados = async () => {
 };
 
 navegarDados();
+

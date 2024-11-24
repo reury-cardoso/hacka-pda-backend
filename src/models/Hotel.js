@@ -66,7 +66,10 @@ const Hotel = sequelize.define('Hotel', {
     type: DataTypes.TEXT, 
     allowNull: true,
   },
-  
+  category: {  
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
