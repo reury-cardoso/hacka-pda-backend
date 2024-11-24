@@ -5,7 +5,6 @@ import sequelize from './../db/db.js';
 import fs from 'fs';
 import path from 'path';
 import Hotel from './models/Hotel.js';
-import dotenv from 'dotenv';
 
 
 const app = express();
@@ -18,7 +17,7 @@ app.use('/api', hotelRoutes);
 
 const startServer = async () => {
   try {
-    await sequelize.authenticate();s
+    await sequelize.authenticate();
     console.log('Conexão com o banco de dados estabelecida com sucesso!');
 
     await sequelize.sync();  
@@ -37,7 +36,7 @@ const importarDados = async () => {
     await Hotel.sync({ force: true }); 
     console.log('Tabela Hotels recriada com sucesso!');
 
-    const sqlFilePath = path.resolve('src', 'data', 'Hotels_202411222154.sql');
+    const sqlFilePath = path.resolve('data', 'Hotels_202411222154.sql');
     if (fs.existsSync(sqlFilePath)) {
       const sql = fs.readFileSync(sqlFilePath, 'utf-8');
       await sequelize.query(sql);  
@@ -52,4 +51,3 @@ const importarDados = async () => {
 
 startServer();
 importarDados();
-dotenv.config(); 

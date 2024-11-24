@@ -53,24 +53,7 @@ export const findCategoryByDescription = (description) => {
 };
 
 export const findCategory = async (hotelName, hotelDescription) => {
-<<<<<<< HEAD
-    const urlHotel = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(hotelName)}&format=json`;
-        
     const normalizedHotelName = hotelName.toLowerCase();
-
-    try {   
-        const responseHotel = await fetch(urlHotel);
-        const dataHotel = await responseHotel.json();
-        if (dataHotel && dataHotel.length > 0) {
-            return "Hotel"; 
-        }
-    } catch (error) {
-        console.error('Erro ao buscar dados do hotel:', error);
-    }
-
-=======
-    const normalizedHotelName = hotelName.toLowerCase();
->>>>>>> a7b3e9eb6d589013d16d30ffca0cd8484a36a040
     const normalizedDescription = hotelDescription ? hotelDescription.toLowerCase() : '';
 
     const words = normalizedHotelName.split(' ');
