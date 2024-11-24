@@ -1,10 +1,12 @@
 import fetch from 'node-fetch';
 import Hotel from './models/Hotel.js';
 
-const buscarCategoria = async (nomeHotel, categorias) => {
+const buscarCategoria = async (nomeHotel, categorias, segundaCategoria) => {
     for (let i = 0; i < categorias.length; i++) {
         const tipo = categorias[i];
+        const segundoTipo = segundaCategoria[i];
         const url = `https://nominatim.openstreetmap.org/search?q="${encodeURIComponent(tipo)}+${encodeURIComponent(nomeHotel)}"&format=json`;
+        const urlSegundaCategoria = `https://nominatim.openstreetmap.org/search?q="${encodeURIComponent(segundoTipo)}+${encodeURIComponent(nomeHotel)}"&format=json`;
 
         // console.log(`Consultando: ${url}`); // Log da URL para depuração
 
@@ -12,8 +14,15 @@ const buscarCategoria = async (nomeHotel, categorias) => {
             const response = await fetch(url);
             const data = await response.json();
 
+            const segundoResponse = await fetch(urlSegundaCategoria);
+            const segundaData = await segundoResponse.json();
+
             if (data && data.length > 0) {
                 return tipo.charAt(0).toUpperCase() + tipo.slice(1);
+            }
+
+            if (segundaData && segundaData.length > 0) {
+                return segundoTipo.charAt(0).toUpperCase() + segundoTipo.slice(1);
             }
         } catch (error) {
             console.error(`Erro ao buscar categoria ${tipo}:`, error);
@@ -47,21 +56,25 @@ const navegarDados = async () => {
             'fazenda',    
             'farm hotel', 
             'flat hotel', 
-            'apart hotel',
-            'inn',
+            'apart hotel'
+        ];
+        const segundaCategoria = [
+            'inn',            
             'chalé',
             'albergue',
             'luxury hotel',
             'farm stay',
             'agriturismo',
-            'rural retreat',
             'beach resort',
         ];
 
         for (const hotel of hotéis) {
-            const categoria = await buscarCategoria(hotel.name, categorias);
-
+            const categoria = await buscarCategoria(hotel.name, categorias, segundaCategoria);
+            
+            await hotel.update({ category: categoria });
             console.log(`${hotel.name} - Categoria: ${categoria}`);
+
+            console.log(hotel.category);
 
             // Aqui você pode salvar ou atualizar o hotel com a categoria
             // await hotel.update({ categoria });

@@ -36,10 +36,10 @@ export const findCategoryByDescription = (description) => {
 
 export const findCategory = async (hotelName, hotelDescription) => {
     const urlHotel = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(hotelName)}&format=json`;
-
+        
     const normalizedHotelName = hotelName.toLowerCase();
 
-    try {
+    try {   
         const responseHotel = await fetch(urlHotel);
         const dataHotel = await responseHotel.json();
         if (dataHotel && dataHotel.length > 0) {
