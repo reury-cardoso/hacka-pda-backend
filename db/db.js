@@ -1,9 +1,21 @@
 import { Sequelize } from 'sequelize';
+import dotenv from 'dotenv';
 
+dotenv.config();
 
-const sequelize = new Sequelize({
-  dialect: 'sqlite',
-  storage: './database.sqlite', 
+const isProduction = process.env.NODE_ENV === 'production';
+
+const sequelize = new Sequelize(process.env.DATABASE_URL, {
+  dialect: 'postgres',
+  dialectOptions: isProduction
+    ? {
+        ssl: {
+          require: true,
+          rejectUnauthorized: false, 
+        },
+      }
+    : {},
+  logging: false,
 });
 
 const testarConexao = async () => {
@@ -11,7 +23,7 @@ const testarConexao = async () => {
     await sequelize.authenticate();
     console.log('Conexão com o banco de dados foi bem-sucedida.');
   } catch (error) {
-    console.error('Não foi possível conectar ao banco de dados:', error);
+    console.error('Não foi possível conectar ao banco de dados:', error.message);
   }
 };
 
