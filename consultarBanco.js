@@ -1,7 +1,7 @@
 import sqlite3 from 'sqlite3';
 
 
-const db = new sqlite3.Database('./src/database.sqlite', sqlite3.OPEN_READWRITE, (err) => {
+const db = new sqlite3.Database('database.sqlite', sqlite3.OPEN_READWRITE, (err) => {
   if (err) {
     console.error('Erro ao abrir o banco de dados:', err);
   } else {

@@ -36,7 +36,7 @@ const importarDados = async () => {
     await Hotel.sync({ force: true }); 
     console.log('Tabela Hotels recriada com sucesso!');
 
-    const sqlFilePath = path.resolve('data', 'Hotels_202411222154.sql');
+    const sqlFilePath = path.resolve('src/data', 'Hotels_202411222154.sql');
     if (fs.existsSync(sqlFilePath)) {
       const sql = fs.readFileSync(sqlFilePath, 'utf-8');
       await sequelize.query(sql);  
@@ -49,5 +49,5 @@ const importarDados = async () => {
   }
 };
 
-startServer();
+await startServer();
 importarDados();
