@@ -36,7 +36,7 @@ const classificarPrimeiroHotel = async (arquivoSQL) => {
   const match = regex.exec(sql);
 
   if (match) {
-    const nomeHotel = match[1]; 
+    const nomeHotel = match[2]; 
     console.log(`Nome do hotel: ${nomeHotel}`);
 
 
@@ -49,4 +49,4 @@ const classificarPrimeiroHotel = async (arquivoSQL) => {
 };
 
 
-classificarPrimeiroHotel('data/Hotels_202411222154.sql');
+classificarPrimeiroHotel('src/data/Hotels_202411222154.sql');
