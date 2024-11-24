@@ -1,66 +1,92 @@
 import fetch from 'node-fetch';
 import Hotel from './models/Hotel.js';
+import stringSimilarity from 'string-similarity';
 
-const buscarCategoria = async (nomeHotel, categorias) => {
-    for (let i = 0; i < categorias.length; i++) {
-        const tipo = categorias[i];
-        const url = `https://nominatim.openstreetmap.org/search?q="${encodeURIComponent(tipo)}+${encodeURIComponent(nomeHotel)}"&format=json`;
+const categories = {
+    Resort: ["luxo", "spa", "piscina", "cinco estrelas", "resort"],
+    "Hotel Fazenda": ["fazenda", "natureza", "campo", "fazenda"],
+    "Hostel ou Albergue": ["compartilhado", "albergue", "hostel"],
+    "Flat/Apart Hotel": ["flat", "apartamento", "apart", "cozinha", "apart hotel"],
+    Pousada: ["simples", "aconchegante", "acolhedor", "pousada", "inn"],
+    Hotel: ["hotel"],
+};
 
-        // console.log(`Consultando: ${url}`); // Log da URL para depuração
+const findCategoryByDescription = (description) => {
+    const normalizedDescription = description ? description.toLowerCase() : '';
 
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
+    let bestMatch = { rating: 0, category: "Não classificado" };
 
-            if (data && data.length > 0) {
-                return tipo.charAt(0).toUpperCase() + tipo.slice(1);
+    for (const [category, keywords] of Object.entries(categories)) {
+        let categoryMatchScore = 0;
+
+        for (const keyword of keywords) {
+            if (normalizedDescription.includes(keyword)) {
+                return category; 
             }
-        } catch (error) {
-            console.error(`Erro ao buscar categoria ${tipo}:`, error);
+            categoryMatchScore += stringSimilarity.compareTwoStrings(normalizedDescription, keyword);
+        }
+
+        if (categoryMatchScore > bestMatch.rating) {
+            bestMatch = { rating: categoryMatchScore, category };
         }
     }
-    const urlHotel = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(nomeHotel)}&format=json`;
 
-    // console.log(`Consultando hotel: ${urlHotel}`); 
+    return bestMatch.category;
+};
 
-    const responseHotel = await fetch(urlHotel);
-    const dataHotel = await responseHotel.json();
-    if (dataHotel && dataHotel.length > 0) {
-        return "Hotel"; 
+const findCategory = async (hotelName, hotelDescription) => {
+    const urlHotel = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(hotelName)}&format=json`;
+
+    const normalizedHotelName = hotelName.toLowerCase();
+
+    try {
+        const responseHotel = await fetch(urlHotel);
+        const dataHotel = await responseHotel.json();
+        if (dataHotel && dataHotel.length > 0) {
+            return "Hotel"; 
+        }
+    } catch (error) {
+        console.error('Erro ao buscar dados do hotel:', error);
+    }
+
+    const normalizedDescription = hotelDescription ? hotelDescription.toLowerCase() : '';
+    const words = normalizedHotelName.split(' ');
+
+    for (const [category, keywords] of Object.entries(categories)) {
+        for (const keyword of keywords) {
+            if (words.includes(keyword)) {
+                return category; 
+            }
+        }
+    }
+
+    const categoryByDescription = findCategoryByDescription(normalizedDescription);
+    if (categoryByDescription !== "Não classificado") {
+        return categoryByDescription; 
     }
 
     return 'Não classificado';
 };
 
-const navegarDados = async () => {
+const navigateData = async () => {
     try {
-        const hotéis = await Hotel.findAll(); 
-        if (hotéis.length === 0) {
+        const hotels = await Hotel.findAll(); 
+        if (hotels.length === 0) {
             console.log("Nenhum dado encontrado.");
             return;
         }
 
-        const categorias = [            
-            'pousada',    
-            'hostel',     
-            'resort',     
-            'fazenda',    
-            'farm+hotel', 
-            'flat+hotel', 
-            'apart+hotel' 
-        ];
+        for (const hotel of hotels) {
+            const category = await findCategory(hotel.name, hotel.description);
 
-        for (const hotel of hotéis) {
-            const categoria = await buscarCategoria(hotel.name, categorias);
-
-            console.log(`${hotel.name} - Categoria: ${categoria}`);
+            console.log(`${hotel.name} - Categoria: ${category}`);
 
             // Aqui você pode salvar ou atualizar o hotel com a categoria
-            // await hotel.update({ categoria });
+            // await hotel.update({ category });
         }
     } catch (error) {
         console.error('Erro ao buscar dados:', error);
     }
 };
 
-navegarDados();
+navigateData();

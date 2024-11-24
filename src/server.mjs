@@ -10,7 +10,7 @@ const importarDados = async () => {
     console.log('Tabela Hotels recriada com sucesso!');
 
    
-    const sql = fs.readFileSync(path.resolve('data', 'Hotels_202411222154.sql'), 'utf-8');
+    const sql = fs.readFileSync(path.resolve('src','data', 'Hotels_202411222154.sql'), 'utf-8');
 
     
     await sequelize.query(sql);
