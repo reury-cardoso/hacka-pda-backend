@@ -72,3 +72,4 @@ const navegarDados = async () => {
 };
 
 navegarDados();
+
